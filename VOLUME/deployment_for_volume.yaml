@@ -1,3 +1,5 @@
+# for checking configmap and secret volume mounting
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,18 +30,16 @@ spec:
                 secretKeyRef:
                   name: mongodb-secret
                   key: password
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: mongodb-service
-spec:
-  selector:
-    app: mongodb
-  ports:
-    - protocol: TCP
-      port: 27017
-      targetPort: 27017
-
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /data/configMap
+            - name: secret-volume
+              mountPath: /data/secret  
+              readOnly: true
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: configmap-file
+        - name: secret-volume
+          secret:
+            secretName: secret-file 
