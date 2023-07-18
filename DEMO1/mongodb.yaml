@@ -1,3 +1,37 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: mongodb-deployment
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: mongodb
+#   template:
+#     metadata:
+#       labels:
+#         app: mongodb
+#     spec:
+#       containers:
+#         - name: mongodb
+#           image: mongo:4.4
+#           ports:
+#             - containerPort: 27017
+#           env:
+#             - name: MONGO_INITDB_ROOT_USERNAME
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: mongodb-secret
+#                   key: username
+#             - name: MONGO_INITDB_ROOT_PASSWORD
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: mongodb-secret
+#                   key: password
+
+---
+# for checking configmap and secret volume mounting
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,6 +62,20 @@ spec:
                 secretKeyRef:
                   name: mongodb-secret
                   key: password
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /data/configMap
+            - name: secret-volume
+              mountPath: /data/secret  
+              readOnly: true
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: configmap-file
+        - name: secret-volume
+          secret:
+            secretName: secret-file 
+
 
 ---
 
